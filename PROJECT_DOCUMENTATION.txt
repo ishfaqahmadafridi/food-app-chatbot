@@ -1,0 +1,1160 @@
+========================================
+    RESTOBOT - COMPLETE PROJECT DOCUMENTATION
+========================================
+
+TABLE OF CONTENTS
+=================
+1. Project Overview
+2. Frontend Architecture (React)
+3. Backend Architecture (Django)
+4. Chatbot Implementation (LangChain)
+5. Why Use Microphone in Chatbot?
+6. Axios & REST API Explained (Simple)
+7. API Endpoints Reference
+8. Database Models
+9. Authentication & Security
+10. Technology Stack
+11. Setup Guide
+
+
+========================================
+1. PROJECT OVERVIEW
+========================================
+
+RestoBot is a full-stack restaurant food ordering application with AI-powered chatbot support.
+
+Key Features:
+- Browse food items by categories with ratings and prices
+- Shopping cart with real-time updates
+- User authentication (JWT-based)
+- Admin dashboard for menu management
+- AI Chatbot with voice input support
+- Admin can manage items through chatbot (add/update/delete)
+- Responsive design for mobile and desktop
+
+Project Type: Full-stack Web Application
+Frontend Port: http://localhost:5173
+Backend Port: http://localhost:8000
+
+
+========================================
+2. FRONTEND ARCHITECTURE (REACT)
+========================================
+
+2.1 TECHNOLOGY STACK
+--------------------
+Framework: React 19.1.1
+Build Tool: Vite 7.1.2 (Fast build and hot module replacement)
+Styling: Tailwind CSS 4.1.18 (Utility-first CSS framework)
+Routing: React Router DOM 7.8.2 (Client-side routing)
+HTTP Client: Axios 1.13.4 (API calls)
+Notifications: React Hot Toast 2.6.0 (Toast notifications)
+Animations: Framer Motion 12.33.0 (Page transitions and animations)
+Icons: Lucide React 0.563.0 (Modern icon library)
+
+2.2 STATE MANAGEMENT - CONTEXT API (NOT REDUX)
+-----------------------------------------------
+Why Context API instead of Redux:
+✅ Simpler and lighter for this project size
+✅ Built-in React feature (no extra library)
+✅ Perfect for passing data through component tree
+✅ Sufficient for cart and authentication state
+✅ Less boilerplate code compared to Redux
+
+StoreContext (src/context/StoreContext.jsx):
+- Manages global state for:
+  * Food items list
+  * Shopping cart items
+  * Cart operations (add/remove)
+  * Loading states
+  * Total calculations
+
+Context Provider wraps entire app in main.jsx
+All components access state via useContext(StoreContext)
+
+2.3 FOLDER STRUCTURE
+-------------------
+src/
+├── assets/           # Images, icons, static data
+├── components/       # Reusable UI components
+│   ├── Navbar/       # Navigation bar
+│   ├── Footer/       # Footer section
+│   ├── Header/       # Hero section
+│   ├── Menu/         # Category menu
+│   ├── FoodDisplay/  # Food grid display
+│   ├── FoodItem/     # Individual food card
+│   ├── Login/        # Login/Signup modal
+│   └── AppDownload/  # App promotion section
+├── pages/            # Page components
+│   ├── Home/         # Landing page
+│   ├── Cart/         # Shopping cart page
+│   ├── Chatbot/      # AI Chatbot interface
+│   ├── ItemDetail/   # Food item details
+│   ├── Placeorder/   # Checkout page
+│   └── Admin/        # Admin dashboard
+├── context/          # Context API state management
+│   └── StoreContext.jsx
+├── services/         # API service layer
+│   └── api.js        # Axios instance with interceptors
+├── App.jsx           # Root component with routes
+└── main.jsx          # Entry point
+
+2.4 ROUTING
+-----------
+Routes defined in App.jsx using React Router:
+- / (Home)             → Browse food items
+- /cart                → Shopping cart
+- /order               → Place order/checkout
+- /chatbot             → AI Chatbot
+- /item/:id            → Item details
+- /admin               → Admin dashboard
+
+2.5 API INTEGRATION
+------------------
+File: src/services/api.js
+
+Axios instance with:
+- Base URL: http://localhost:8000/api/
+- Request interceptor: Adds JWT token from localStorage
+- Response interceptor: Handles 401 errors (token expiry)
+- Automatic token refresh logic
+
+All API calls go through this centralized service:
+Example: api.get('/items/'), api.post('/cart/', data)
+
+2.6 KEY COMPONENTS
+------------------
+FoodItem Component:
+- Displays individual food card
+- Shows name, image, price, rating
+- Add to cart button
+- Handles quantity increment
+
+Navbar Component:
+- Shows cart count badge
+- Login/Logout functionality
+- Navigation links
+- User profile indicator
+
+Login Component:
+- Modal-based login/signup
+- Form validation
+- JWT token storage
+- Switch between login/register
+
+2.7 CSS STYLING
+---------------
+Tailwind CSS: Utility classes for rapid UI development
+Custom CSS: Component-specific styles in .css files
+Responsive Design: Mobile-first approach
+Animations: Framer Motion for smooth transitions
+
+
+========================================
+3. BACKEND ARCHITECTURE (DJANGO)
+========================================
+
+3.1 TECHNOLOGY STACK
+--------------------
+Framework: Django 6.0.1 (Python web framework)
+API Framework: Django REST Framework 3.14.0
+Authentication: djangorestframework-simplejwt 5.5.1 (JWT tokens)
+CORS Handling: django-cors-headers 4.9.0
+Image Processing: Pillow 10.1.0
+Environment Variables: python-decouple 3.8
+Database: SQLite (default, can switch to PostgreSQL)
+AI Framework: LangChain 0.1.0+ (for chatbot)
+LLM Provider: LangChain-OpenAI 0.1.0+
+
+3.2 PROJECT STRUCTURE
+---------------------
+backend/
+├── manage.py              # Django management script
+├── db.sqlite3             # SQLite database
+├── requirements.txt       # Python dependencies
+├── populate_data.py       # Sample data generator
+├── backend/               # Main project settings
+│   ├── settings.py        # Configuration
+│   ├── urls.py            # URL routing
+│   ├── wsgi.py            # WSGI config
+│   └── asgi.py            # ASGI config
+├── api/                   # Food ordering API
+│   ├── models.py          # Database models
+│   ├── serializers.py     # DRF serializers
+│   ├── views.py           # API views
+│   ├── urls.py            # API routes
+│   └── migrations/        # Database migrations
+└── chatbot/               # AI Chatbot app
+    ├── chains.py          # LangChain chains
+    ├── tools.py           # LangChain tools
+    ├── views.py           # Chatbot API views
+    └── urls.py            # Chatbot routes
+
+3.3 DJANGO APPS
+---------------
+1. api - Main food ordering functionality
+   - Food items management
+   - Categories
+   - Cart management
+   - User authentication
+   - Ratings
+
+2. chatbot - AI chatbot functionality
+   - LangChain integration
+   - Natural language processing
+   - Admin commands
+   - Voice-to-text conversion
+
+3.4 MIDDLEWARE & SECURITY
+-------------------------
+CORS: Allows frontend (localhost:5173) to access API
+CSRF Protection: Enabled for form submissions
+Session Management: JWT-based stateless authentication
+Content Security: SQL injection protection via Django ORM
+File Upload Security: Pillow validates uploaded images
+
+
+========================================
+4. CHATBOT IMPLEMENTATION (LANGCHAIN)
+========================================
+
+4.1 WHY LANGCHAIN?
+------------------
+✅ Abstracts LLM complexity (easier to work with OpenAI)
+✅ Built-in tools/function calling support
+✅ Chain-based architecture for complex workflows
+✅ Prompt template management
+✅ Easy integration with Django
+✅ Production-ready framework
+✅ Community support and documentation
+
+4.2 LLM CONFIGURATION (chains.py)
+---------------------------------
+Model: GPT-4o-mini (OpenAI)
+- Fast and cost-effective
+- Good for conversational AI
+- Balances quality and speed
+
+Temperature: 0.3
+- Lower temperature for consistent responses
+- Reduces hallucinations
+- More predictable outputs
+
+Why GPT-4o-mini over GPT-4:
+- 60% cheaper
+- Faster response time
+- Sufficient for restaurant chatbot
+- Lower latency for better UX
+
+4.3 PROMPT ENGINEERING
+----------------------
+System Prompt (defined in chains.py):
+- Restricts bot to food-related queries only
+- Prevents off-topic discussions (politics, personal questions)
+- Provides clear instructions for response format
+- Supports both English and Hinglish
+
+Strict Rules:
+1. Only answer food/menu/recipe/restaurant questions
+2. Reject non-food queries with specific message
+3. Keep responses friendly and concise
+4. List menu items with prices when asked
+5. Help with ingredients and cooking tips
+
+4.4 LANGCHAIN CHAIN ARCHITECTURE
+--------------------------------
+Chain Structure:
+Prompt Template → LLM (GPT-4o-mini) → String Output Parser
+
+ChatPromptTemplate:
+- system: System instructions (bot personality)
+- human: User input (question)
+
+String Output Parser:
+- Converts LLM response to plain text
+- Removes unnecessary formatting
+
+agent_executor variable:
+- Combines prompt, LLM, and parser
+- Called with: agent_executor.invoke({"input": message})
+
+4.5 LANGCHAIN TOOLS (tools.py)
+------------------------------
+Why Tools?
+- Allow LLM to perform actions (not just answer)
+- Function calling capability
+- Interact with database
+- Execute business logic
+
+Available Tools:
+
+1. @tool get_menu_items()
+   Returns: List of available food items with prices
+   Use Case: "What's on the menu?", "Show me dishes"
+   
+2. @tool add_to_cart(item_name, quantity)
+   Returns: Confirmation message
+   Use Case: "Add 2 Chicken Burgers to cart"
+   
+3. @tool create_dish(name, price, description, category)
+   Returns: Success/error message
+   Use Case: Admin adds new menu item via chat
+
+How Tools Work:
+- Decorated with @tool
+- LLM decides when to call them
+- Automatically extract parameters
+- Return results to LLM for natural response
+
+4.6 CHATBOT VIEWS (views.py)
+----------------------------
+ChatView (API endpoint):
+- POST /api/chatbot/
+- Accepts: {"message": "user question"}
+- Returns: {"reply": "bot response"}
+
+Features:
+✅ Admin Detection: Checks if user is staff
+✅ Admin Commands: Add/Remove/Update items via regex parsing
+✅ Natural Language Processing: Understands intent
+✅ Database Integration: CRUD operations on FoodItem model
+✅ Error Handling: Graceful fallbacks
+
+Admin Commands (Regex-based):
+- "add item [name] price [amount] category [category] description [text]"
+- "remove [item name]"
+- "update [item name] price [new price]"
+- "list items"
+
+Why Regex parsing for admin commands?
+- More reliable than LLM for structured commands
+- Faster processing
+- Predictable behavior
+- No API costs for parsing
+
+4.7 VOICE-TO-TEXT INTEGRATION
+-----------------------------
+Endpoint: POST /api/chatbot/voice-to-text/
+Accepts: Audio file (FormData)
+Returns: Transcribed text
+
+Backend Processing:
+1. Receives audio blob (webm format)
+2. Converts to text using OpenAI Whisper API
+3. Returns transcribed text to frontend
+4. Frontend automatically processes as chat message
+
+Technologies:
+- OpenAI Whisper API (speech recognition)
+- Django file handling (TemporaryUploadedFile)
+- FormData (multipart/form-data)
+
+
+========================================
+5. WHY USE MICROPHONE IN CHATBOT?
+========================================
+
+5.1 USER EXPERIENCE BENEFITS
+----------------------------
+✅ Hands-Free Interaction: Users can order while multitasking
+✅ Faster Input: Speaking is faster than typing
+✅ Accessibility: Helps users with typing difficulties
+✅ Modern UX: Voice is the future of interfaces
+✅ Convenience: Easy to use on mobile devices
+✅ Natural Communication: More conversational experience
+
+5.2 USE CASES FOR VOICE INPUT
+-----------------------------
+1. Ordering While Cooking: "Add 2 pizzas to my cart"
+2. Mobile Users: Easier than typing on small screens
+3. Quick Queries: "What's the price of biryani?"
+4. Accessibility: Users with typing difficulties
+5. Multitasking: Order while doing other tasks
+
+5.3 TECHNICAL IMPLEMENTATION
+----------------------------
+Frontend (Chatbot.jsx):
+
+Web APIs Used:
+- navigator.mediaDevices.getUserMedia() 
+  → Requests microphone access from browser
+  
+- MediaRecorder API
+  → Records audio in WebM format
+  → Handles audio chunks
+  
+- Blob API
+  → Creates audio blob from chunks
+  → Sends to backend via FormData
+
+Recording Flow:
+1. User clicks microphone button
+2. Browser asks for microphone permission
+3. MediaRecorder starts capturing audio
+4. Audio chunks stored in array
+5. User clicks stop
+6. Chunks combined into Blob
+7. Blob sent to backend via API
+8. Backend transcribes using Whisper
+9. Text returned and auto-sent to chatbot
+
+State Management:
+- isRecording: Boolean (mic active or not)
+- mediaRecorderRef: Reference to MediaRecorder
+- audioChunksRef: Stores audio data
+
+UI Indicators:
+- Mic button changes color when recording
+- Shows MicOff icon during recording
+- Disables text input while recording
+- Shows loading state during transcription
+
+5.4 SECURITY CONSIDERATIONS
+---------------------------
+Browser Permissions:
+- User must explicitly allow microphone access
+- Permission persists per domain
+- Can be revoked in browser settings
+
+API Security:
+- JWT authentication required
+- File size limits to prevent abuse
+- Audio validation on backend
+- Rate limiting recommended for production
+
+5.5 BROWSER COMPATIBILITY
+-------------------------
+Supported Browsers:
+✅ Chrome/Edge: Full support
+✅ Firefox: Full support
+✅ Safari: Full support (iOS 14.3+)
+❌ Internet Explorer: Not supported
+
+Fallback:
+- If microphone not available, text input still works
+- Error message shown if getUserMedia fails
+- No app breaking if voice feature disabled
+
+
+========================================
+6. AXIOS & REST API EXPLAINED (SIMPLE)
+========================================
+
+6.1 WHAT IS REST API?
+---------------------
+REST API = A way for frontend and backend to talk to each other
+
+Think of it like ordering food at a restaurant:
+- Frontend (You) → Makes request → Backend (Kitchen)
+- Backend processes → Sends response → Frontend receives data
+
+REST uses HTTP methods:
+- GET = "Give me data" (like reading a menu)
+- POST = "Create new data" (like placing an order)
+- PUT/PATCH = "Update existing data" (like modifying your order)
+- DELETE = "Remove data" (like canceling an order)
+
+6.2 WHAT IS AXIOS?
+------------------
+Axios = A JavaScript library to make HTTP requests easily
+
+Why use Axios instead of fetch()?
+✅ Simpler syntax
+✅ Automatic JSON conversion
+✅ Interceptors (add token to all requests automatically)
+✅ Better error handling
+✅ Request/response transformations
+✅ Cancel requests
+✅ Timeout support
+
+6.3 HOW AXIOS WORKS IN THIS PROJECT
+-----------------------------------
+
+Step 1: Create Axios Instance (src/services/api.js)
+```javascript
+import axios from 'axios';
+
+const api = axios.create({
+  baseURL: 'http://localhost:8000/api/',
+  headers: {
+    'Content-Type': 'application/json'
+  }
+});
+```
+
+Step 2: Add JWT Token Automatically (Request Interceptor)
+```javascript
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem('userToken');
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+```
+
+This means EVERY request automatically includes the user's token!
+
+Step 3: Handle Errors (Response Interceptor)
+```javascript
+api.interceptors.response.use(
+  (response) => response,  // If success, just return data
+  (error) => {
+    if (error.response.status === 401) {
+      // Token expired, logout user
+      localStorage.removeItem('userToken');
+      window.location.href = '/';
+    }
+    return Promise.reject(error);
+  }
+);
+```
+
+6.4 MAKING API CALLS - EXAMPLES
+--------------------------------
+
+Example 1: GET Request (Fetch food items)
+```javascript
+// Component code
+const fetchFoodItems = async () => {
+  try {
+    const response = await api.get('/items/');
+    // response.data contains the food items array
+    setFoodItems(response.data);
+  } catch (error) {
+    console.error('Error:', error);
+  }
+};
+```
+
+What happens behind the scenes:
+1. api.get('/items/') → Sends GET request to http://localhost:8000/api/items/
+2. Token automatically added to headers
+3. Backend processes request
+4. Backend returns JSON with food items
+5. Axios converts JSON to JavaScript object automatically
+6. response.data contains the items
+
+Example 2: POST Request (Login user)
+```javascript
+const handleLogin = async (username, password) => {
+  try {
+    const response = await api.post('/login/', {
+      username: username,
+      password: password
+    });
+    // response.data = { access: "token...", refresh: "token..." }
+    localStorage.setItem('userToken', response.data.access);
+  } catch (error) {
+    alert('Login failed');
+  }
+};
+```
+
+What happens:
+1. api.post() sends data to backend
+2. Backend validates username/password
+3. Backend returns JWT tokens
+4. Frontend saves token to localStorage
+5. Future requests include this token automatically
+
+Example 3: POST with FormData (Voice upload)
+```javascript
+const sendAudioToBackend = async (audioBlob) => {
+  const formData = new FormData();
+  formData.append('file', audioBlob, 'recording.webm');
+  
+  const response = await api.post('/chatbot/voice-to-text/', formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  });
+  
+  return response.data.text; // Transcribed text
+};
+```
+
+Example 4: DELETE Request (Remove from cart)
+```javascript
+const removeFromCart = async (itemId) => {
+  try {
+    await api.delete(`/cart-items/${itemId}/`);
+    toast.success('Item removed from cart');
+  } catch (error) {
+    toast.error('Failed to remove item');
+  }
+};
+```
+
+6.5 COMPLETE API CALL FLOW
+---------------------------
+
+Frontend Component:
+```
+User clicks button
+   ↓
+Call function with api.get() or api.post()
+   ↓
+Axios adds base URL: /items/ → http://localhost:8000/api/items/
+   ↓
+Interceptor adds JWT token to headers
+   ↓
+Request sent to Django backend
+```
+
+Backend (Django):
+```
+Django receives request
+   ↓
+Check authentication (JWT token valid?)
+   ↓
+Run view function (e.g., get list of items from database)
+   ↓
+Serialize data (convert Python objects to JSON)
+   ↓
+Send JSON response back
+```
+
+Frontend Response:
+```
+Axios receives response
+   ↓
+Automatically converts JSON to JavaScript object
+   ↓
+Store in state: setFoodItems(response.data)
+   ↓
+React re-renders component with new data
+   ↓
+User sees updated UI
+```
+
+6.6 ERROR HANDLING
+------------------
+
+```javascript
+try {
+  const response = await api.get('/items/');
+  // Success - do something with response.data
+} catch (error) {
+  if (error.response) {
+    // Backend returned error (4xx or 5xx)
+    console.log('Status:', error.response.status);
+    console.log('Data:', error.response.data);
+  } else if (error.request) {
+    // Request sent but no response (network error)
+    console.log('No response from server');
+  } else {
+    // Something else went wrong
+    console.log('Error:', error.message);
+  }
+}
+```
+
+6.7 WHY THIS ARCHITECTURE?
+--------------------------
+
+✅ Centralized API calls - All requests go through one api.js file
+✅ Automatic authentication - No need to manually add token each time
+✅ Error handling in one place - Interceptor handles all 401 errors
+✅ Easy to modify - Change base URL in one place
+✅ Reusable - Import api in any component and use it
+✅ Clean code - Components don't worry about tokens/headers
+✅ Testable - Easy to mock api calls in tests
+
+
+========================================
+7. API ENDPOINTS REFERENCE
+========================================
+
+Base URL: http://localhost:8000/api/
+
+7.1 AUTHENTICATION ENDPOINTS
+----------------------------
+POST /api/signup/
+Body: {username, email, password}
+Returns: {user, token}
+
+POST /api/login/
+Body: {username, password}
+Returns: {access, refresh, user}
+
+POST /api/token/refresh/
+Body: {refresh}
+Returns: {access}
+
+7.2 FOOD ITEMS ENDPOINTS
+------------------------
+GET /api/items/
+Returns: List of all food items
+Public: Yes
+
+GET /api/items/{id}/
+Returns: Single item details
+Public: Yes
+
+POST /api/items/
+Body: {name, price, category, description, image}
+Auth: Required (Admin only)
+
+PUT /api/items/{id}/
+Body: Updated item data
+Auth: Required (Admin only)
+
+DELETE /api/items/{id}/
+Auth: Required (Admin only)
+
+7.3 CATEGORIES ENDPOINTS
+------------------------
+GET /api/categories/
+Returns: List of all categories
+Public: Yes
+
+7.4 CART ENDPOINTS
+------------------
+GET /api/cart/
+Returns: User's cart with items
+Auth: Required
+
+POST /api/cart/
+Body: {dish_id, quantity}
+Returns: Updated cart
+Auth: Required
+
+DELETE /api/cart-items/{id}/
+Removes item from cart
+Auth: Required
+
+7.5 CHATBOT ENDPOINTS
+---------------------
+POST /api/chatbot/
+Body: {message: "user question"}
+Returns: {reply: "bot response"}
+Auth: Optional (enhanced for authenticated users)
+
+POST /api/chatbot/voice-to-text/
+Body: FormData with audio file
+Returns: {text: "transcribed text"}
+Auth: Optional
+
+7.6 PROFILE ENDPOINTS
+---------------------
+GET /api/profile/
+Returns: User profile data
+Auth: Required
+
+7.7 RATINGS ENDPOINTS
+---------------------
+POST /api/ratings/
+Body: {food_item_id, rating}
+Returns: Created rating
+Auth: Required
+
+
+========================================
+8. DATABASE MODELS
+========================================
+
+8.1 CATEGORY MODEL
+------------------
+Fields:
+- name: CharField (unique)
+- image: ImageField (optional)
+- is_active: BooleanField
+
+Relationships:
+- One-to-Many with FoodItem
+
+Purpose: Organize food items (Appetizers, Main Course, Desserts, etc.)
+
+8.2 FOODITEM MODEL
+------------------
+Fields:
+- name: CharField
+- image: ImageField (uploaded to images/YYYY/MM/)
+- price: DecimalField (10 digits, 2 decimals)
+- description: TextField
+- category: ForeignKey (Category)
+- is_available: BooleanField (stock status)
+- rating: DecimalField (3 digits, 1 decimal)
+- created_at: DateTimeField (auto)
+- updated_at: DateTimeField (auto)
+
+Relationships:
+- Many-to-One with Category
+- One-to-Many with CartItem
+- One-to-Many with Rating
+
+Meta:
+- Ordering: Newest first (-created_at)
+
+8.3 CART MODEL
+--------------
+Fields:
+- user: OneToOneField (User) - One cart per user
+- session_key: CharField (for guest users)
+- created_at: DateTimeField
+- updated_at: DateTimeField
+
+Relationships:
+- One-to-One with User
+- One-to-Many with CartItem
+
+Purpose: Container for user's cart items
+
+8.4 CARTITEM MODEL
+------------------
+Fields:
+- cart: ForeignKey (Cart)
+- dish: ForeignKey (FoodItem)
+- quantity: PositiveIntegerField
+
+Constraints:
+- unique_together: (cart, dish) - Prevents duplicate items
+
+Purpose: Individual items in cart with quantities
+
+8.5 RATING MODEL
+----------------
+Fields:
+- user: ForeignKey (User)
+- food_item: ForeignKey (FoodItem)
+- rating: IntegerField (1-5)
+- created_at: DateTimeField
+- updated_at: DateTimeField
+
+Constraints:
+- unique_together: (user, food_item) - One rating per user per item
+
+Purpose: User ratings for food items
+
+
+========================================
+9. AUTHENTICATION & SECURITY
+========================================
+
+9.1 JWT (JSON WEB TOKEN) AUTHENTICATION
+---------------------------------------
+Why JWT?
+✅ Stateless: No session storage on server
+✅ Scalable: Works across multiple servers
+✅ Mobile-friendly: Easy to use in apps
+✅ Secure: Encrypted token with expiry
+✅ RESTful: Perfect for REST APIs
+
+Token Types:
+1. Access Token (15 min expiry)
+   - Used for API requests
+   - Stored in localStorage
+   - Sent in Authorization header
+   
+2. Refresh Token (7 days expiry)
+   - Used to get new access token
+   - Stored in localStorage
+   - Only sent to /token/refresh/
+
+Flow:
+Login → Get access + refresh tokens → Store in localStorage
+→ Include access token in API headers → Token expires
+→ Use refresh token to get new access token → Continue
+
+9.2 FRONTEND TOKEN HANDLING
+---------------------------
+Storage: localStorage
+- localStorage.setItem('userToken', accessToken)
+- localStorage.setItem('refreshToken', refreshToken)
+
+Axios Interceptor:
+- Automatically adds token to all requests
+- Checks for 401 errors
+- Auto-refreshes token if expired
+- Logs out if refresh fails
+
+9.3 ADMIN PRIVILEGES
+--------------------
+Detection: request.user.is_staff (Django)
+Storage: localStorage.setItem('isAdmin', 'true')
+
+Admin Features:
+- Manage menu items via chatbot
+- Access admin dashboard
+- View all orders
+- Modify food items
+- Enhanced chatbot commands
+
+9.4 CORS CONFIGURATION
+----------------------
+Settings in backend/settings.py:
+CORS_ALLOWED_ORIGINS = ['http://localhost:5173']
+CORS_ALLOW_CREDENTIALS = True
+
+Why CORS?
+- Browser security prevents cross-origin requests
+- Backend and frontend run on different ports
+- CORS middleware allows frontend to access API
+- Credentials enabled for cookie/auth headers
+
+
+========================================
+10. TECHNOLOGY STACK SUMMARY
+========================================
+
+FRONTEND
+--------
+- React 19.1.1 - UI library
+- Vite 7.1.2 - Build tool
+- Tailwind CSS 4.1.18 - Styling
+- React Router DOM 7.8.2 - Routing
+- Axios 1.13.4 - HTTP client
+- Context API - State management
+- Framer Motion 12.33.0 - Animations
+- Lucide React 0.563.0 - Icons
+- React Hot Toast 2.6.0 - Notifications
+
+BACKEND
+-------
+- Django 6.0.1 - Web framework
+- Django REST Framework 3.14.0 - API
+- djangorestframework-simplejwt 5.5.1 - JWT auth
+- django-cors-headers 4.9.0 - CORS
+- SQLite - Database
+- Pillow 10.1.0 - Image processing
+
+AI/CHATBOT
+----------
+- LangChain 0.1.0+ - LLM framework
+- LangChain-OpenAI 0.1.0+ - OpenAI integration
+- OpenAI GPT-4o-mini - Language model
+- OpenAI Whisper - Speech recognition
+- Temperature 0.3 - Consistent responses
+
+VOICE FEATURES
+--------------
+- MediaRecorder API - Audio recording
+- getUserMedia API - Microphone access
+- WebM Audio Format - Audio encoding
+- FormData - File upload
+- OpenAI Whisper API - Transcription
+
+DEVELOPMENT TOOLS
+-----------------
+- ESLint 9.33.0 - Code linting
+- PostCSS 8.5.6 - CSS processing
+- Autoprefixer 10.4.24 - CSS vendor prefixes
+
+
+========================================
+11. SETUP GUIDE
+========================================
+
+PREREQUISITES
+-------------
+- Python 3.8+ installed
+- Node.js 16+ installed
+- OpenAI API key (for chatbot)
+- Git (for version control)
+
+BACKEND SETUP
+-------------
+1. Navigate to backend folder:
+   cd backend
+
+2. Create virtual environment:
+   python -m venv venv
+
+3. Activate virtual environment:
+   Windows: venv\Scripts\activate
+   Mac/Linux: source venv/bin/activate
+
+4. Install dependencies:
+   pip install -r requirements.txt
+
+5. Set environment variable:
+   Windows: set OPENAI_API_KEY=your-api-key-here
+   Mac/Linux: export OPENAI_API_KEY=your-api-key-here
+
+6. Run migrations:
+   python manage.py migrate
+
+7. Create sample data:
+   python populate_data.py
+
+8. Start server:
+   python manage.py runserver
+
+Backend runs at: http://localhost:8000
+
+FRONTEND SETUP
+--------------
+1. Navigate to frontend folder:
+   cd frontend
+
+2. Install dependencies:
+   npm install
+
+3. Start development server:
+   npm run dev
+
+Frontend runs at: http://localhost:5173
+
+DEFAULT ADMIN CREDENTIALS
+-------------------------
+Username: admin
+Password: admin123
+Admin URL: http://localhost:8000/admin/
+
+
+========================================
+KEY FEATURES EXPLANATION
+========================================
+
+CONTEXT API vs REDUX
+--------------------
+This project uses Context API because:
+- Simpler setup (no store, reducers, actions)
+- Built into React (no extra dependency)
+- Perfect for small to medium apps
+- Easy to understand and maintain
+- Less boilerplate code
+- Sufficient for cart and auth state
+
+Redux would be overkill for this project size.
+
+LANGCHAIN TOOLS
+---------------
+Tools allow the chatbot to:
+- Query database for menu items
+- Add items to cart
+- Create/update/delete dishes (admin)
+- Execute Python functions
+- Return structured data
+
+Without tools, chatbot can only answer questions.
+With tools, chatbot can perform actions.
+
+VOICE INPUT FEATURE
+-------------------
+Why it's important:
+- Improves accessibility
+- Faster than typing
+- Better mobile UX
+- Modern interface
+- Hands-free operation
+
+Technical flow:
+Browser records audio → Sends to backend → Whisper transcribes
+→ Text sent to chatbot → Bot processes → Returns response
+
+ADMIN CHATBOT COMMANDS
+----------------------
+Admins can manage menu via chat:
+✅ "add item Burger price 200 category Fast Food description Tasty burger"
+✅ "remove Pizza"
+✅ "update Burger price 250"
+✅ "list items"
+
+Benefits:
+- Quick menu management
+- No need to use admin panel
+- Natural language interface
+- Faster than manual CRUD
+
+DJANGO REST FRAMEWORK
+---------------------
+Why DRF?
+- Powerful API tools
+- Automatic API documentation
+- Serialization/deserialization
+- Authentication built-in
+- ViewSets for CRUD operations
+- Validation and error handling
+
+
+========================================
+PROJECT BEST PRACTICES
+========================================
+
+1. Separation of Concerns: Frontend, Backend, AI separated
+2. Modular Code: Components, services, models in separate files
+3. Error Handling: Try-catch blocks, graceful fallbacks
+4. Security: JWT auth, CORS, input validation
+5. Code Reusability: Context for global state, api.js service
+6. Scalability: Can add features without breaking existing code
+7. User Experience: Loading states, toast notifications, animations
+8. Documentation: Comments in code, clear file structure
+9. Environment Variables: Sensitive data in .env
+10. Version Control: Git-friendly structure
+
+
+========================================
+FUTURE ENHANCEMENTS
+========================================
+
+1. Payment Integration (Stripe/PayPal)
+2. Order Tracking with real-time updates
+3. Email notifications for orders
+4. Review and rating system expansion
+5. Restaurant location map integration
+6. Push notifications
+7. Social media login (Google, Facebook)
+8. Multilingual support
+9. Chatbot improvements (more tools, better context)
+10. Analytics dashboard for admin
+11. Inventory management
+12. Discount codes and promotions
+13. Loyalty program
+14. Employee management system
+15. Kitchen display system
+
+
+========================================
+TROUBLESHOOTING COMMON ISSUES
+========================================
+
+1. CORS Errors:
+   - Check CORS_ALLOWED_ORIGINS in settings.py
+   - Verify frontend URL matches
+
+2. Chatbot Not Responding:
+   - Check OPENAI_API_KEY is set
+   - Verify OpenAI account has credits
+   - Check backend logs for errors
+
+3. Voice Not Working:
+   - Check browser microphone permissions
+   - Use HTTPS or localhost
+   - Verify browser supports MediaRecorder
+
+4. Cart Not Updating:
+   - Check JWT token is valid
+   - Verify user is authenticated
+   - Check localStorage for token
+
+5. Images Not Loading:
+   - Run: python manage.py collectstatic
+   - Verify MEDIA_URL and MEDIA_ROOT settings
+   - Check image file paths
+
+6. Import Errors:
+   - Reinstall dependencies
+   - Check Python/Node versions
+   - Activate virtual environment
+
+
+========================================
+CONTACT & SUPPORT
+========================================
+
+For issues or questions:
+- Check TROUBLESHOOTING.md
+- Check SETUP_SUMMARY.md
+- Check README.md
+- Review this documentation
+
+
+========================================
+END OF DOCUMENTATION
+========================================
+
+Last Updated: February 9, 2026
+Version: 1.0
+Project: RestoBot Restaurant Food Ordering Application
