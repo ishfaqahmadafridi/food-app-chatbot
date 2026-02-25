@@ -26,8 +26,8 @@ const AdminItemsSection = () => {
     dispatch(setPreviewFromUrl(item.image));
   };
 
-  const items = useSelector((state) => state.itemManagement.items);
-  const loading = useSelector((state) => state.itemManagement.loading);
+  const items = useSelector((state) => state.items.items);
+  const loading = useSelector((state) => state.items.loading);
 
 
   const handleDelete = async (id) => {

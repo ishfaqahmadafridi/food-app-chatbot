@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import { resetCategory } from '../../redux/features/menu/menuSlice';
 
 const Page_nav = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const dispatch = useDispatch();
   const [activeMenu, setActiveMenu] = useState('home');
 
   // Update active menu based on current path
@@ -20,6 +23,11 @@ const Page_nav = () => {
       setActiveMenu('');
     }
   }, [location.pathname]);
+
+  const handleHomeClick = () => {
+    setActiveMenu('home');
+    dispatch(resetCategory());
+  };
 
   const handleScrollTo = (sectionId, menuName) => {
     setActiveMenu(menuName);
@@ -44,7 +52,7 @@ const Page_nav = () => {
   return (
     <ul className="flex space-x-6 p-0 m-0 list-none">
       <li className={`cursor-pointer ${activeMenu === 'home' ? 'text-[#ff7675] font-semibold border-b-2 border-[#ff7675] pb-1' : 'text-[#262626]'} `}>
-        <Link to='/' onClick={() => setActiveMenu('home')}>Home</Link>
+        <Link to='/' onClick={handleHomeClick}>Home</Link>
       </li>
       <li className={`cursor-pointer ${activeMenu === 'menu' ? 'text-[#ff7675] font-semibold border-b-2 border-[#ff7675] pb-1' : 'text-[#262626]'} `}>
         <Link to='/menu' onClick={() => setActiveMenu('menu')}>Menu</Link>

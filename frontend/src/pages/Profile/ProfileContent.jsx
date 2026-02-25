@@ -7,7 +7,7 @@ import LoadingState from './LoadingState';
 import { fetchUserProfile } from  '../../redux/features/profile/profileDataThunk';
 import { updateUser } from '../../redux/features/profile/profileDataSlice';
 import { logout } from '../../redux/features/auth/authThunk/authSlice';
-import useScrollLock from '../../hooks/profile/useScrollLock';
+
 
 const ProfileContent = () => {
 
@@ -18,7 +18,7 @@ const ProfileContent = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [isChangingPassword, setIsChangingPassword] = useState(false);
   
-  useScrollLock();
+ 
 
   useEffect(() => {
     const token = localStorage.getItem('userToken');

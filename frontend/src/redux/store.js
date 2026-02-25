@@ -14,6 +14,7 @@ import loginStateReducer from './features/auth/loginStateSlice'
 import loginFormReducer from './features/auth/loginFormSlice'
 import authReducer from './features/auth/authThunk/authSlice'
 import profileDataReducer from './features/profile/profileDataSlice'
+import menuReducer from './features/menu/menuSlice'
 
 export const store = configureStore({
   reducer: {
@@ -37,5 +38,7 @@ export const store = configureStore({
     auth: authReducer,
     // Profile reducers
     profileData: profileDataReducer,
+    // Menu reducers
+    menu: menuReducer,
   },
 })
