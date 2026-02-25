@@ -1,9 +1,19 @@
 import React from 'react';
 import { LogOut, MessageSquare } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import { logoutSuccess } from '../../redux/features/admin/adminLogout/adminLogoutSlice';
 
-const AdminHeader = ({ onLogout }) => {
-  const navigate = useNavigate();
+
+const AdminHeader = () => {
+    const navigate = useNavigate();
+    const dispatch = useDispatch();
+
+    const handleLogout = () => {
+      dispatch(logoutSuccess());
+      navigate('/');
+    };
+
 
   return (
     <div className="flex flex-col md:flex-row justify-between items-center max-w-1200px mx-auto mb-8 text-white p-5 gap-4 md:gap-0">
@@ -17,7 +27,7 @@ const AdminHeader = ({ onLogout }) => {
         </button>
         <button 
           className="bg-red-500 text-white border-0 py-2.5 px-5 rounded-[25px] cursor-pointer flex items-center gap-2.5 font-medium transition-colors hover:bg-[#c0392b]"
-          onClick={onLogout}
+          onClick={handleLogout}
         >
           <LogOut size={20} /> Logout
         </button>

@@ -1,8 +1,21 @@
 import React from 'react'
 import FormInput from './FormInput'
 import FormTextarea from './FormTextarea'
+import { useDispatch, useSelector } from 'react-redux'
+import { updateFormField } from '@/redux/features/contact/contactFormSlice'
 
-const ContactFormFields = ({ formData, onChange }) => {
+const ContactFormFields = () => {
+    const dispatch = useDispatch()
+    const { formData } = useSelector((state) => state.contactForm)
+
+
+    const handleChange = (e) => {
+        dispatch(updateFormField({
+            name: e.target.name,
+            value: e.target.value
+        }))
+    }
+
     return (
         <>
             <FormInput
@@ -10,17 +23,17 @@ const ContactFormFields = ({ formData, onChange }) => {
                 name="name"
                 type="text"
                 value={formData.name}
-                onChange={onChange}
+                onChange={handleChange}
                 placeholder="abc def"
                 required
             />
-            
+
             <FormInput
                 label="Email Address"
                 name="email"
                 type="email"
                 value={formData.email}
-                onChange={onChange}
+                onChange={handleChange}
                 placeholder="abc@example.com"
                 required
             />
@@ -30,7 +43,7 @@ const ContactFormFields = ({ formData, onChange }) => {
                 name="phone"
                 type="tel"
                 value={formData.phone}
-                onChange={onChange}
+                onChange={handleChange}
                 placeholder="+92 300 123 4567"
             />
 
@@ -38,7 +51,7 @@ const ContactFormFields = ({ formData, onChange }) => {
                 label="Your Message"
                 name="message"
                 value={formData.message}
-                onChange={onChange}
+                onChange={handleChange}
                 placeholder="Tell us how we can help you..."
                 rows={5}
                 required

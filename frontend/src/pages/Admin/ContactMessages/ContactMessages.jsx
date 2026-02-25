@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useDispatch, useSelector } from 'react-redux'
+import { checkAdminAccess } from '@/redux/features/admin/adminAccess/adminAccessThunk'
 import MessagesHeader from './MessagesHeader'
 import MessagesFilterTabs from './MessagesFilterTabs'
 import MessageCard from './MessageCard'
@@ -10,6 +12,9 @@ import { Loader2, ArrowLeft } from 'lucide-react'
 
 const ContactMessages = () => {
     const navigate = useNavigate()
+    const dispatch = useDispatch()
+    const { user, loading: adminLoading, error: adminError } = useSelector((state) => state.adminAccess)
+    
     const [messages, setMessages] = useState([])
     const [filteredMessages, setFilteredMessages] = useState([])
     const [activeFilter, setActiveFilter] = useState('all')
@@ -21,6 +26,19 @@ const ContactMessages = () => {
         replied: 0,
         archived: 0
     })
+
+    useEffect(() => {
+        dispatch(checkAdminAccess())
+            .unwrap()
+            .then(() => {
+                fetchMessages()
+            })
+            .catch((err) => {
+                console.error(err)
+                navigate('/')
+            })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [dispatch, navigate])
 
     const fetchMessages = async () => {
         setIsLoading(true)
@@ -37,6 +55,19 @@ const ContactMessages = () => {
         } finally {
             setIsLoading(false)
         }
+    }
+
+    if (adminLoading) {
+        return (
+            <div className="min-h-screen bg-linear-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
+                <Loader2 className="w-8 h-8 animate-spin text-indigo-600" />
+            </div>
+        )
+    }
+
+    if (adminError || !user || !user.is_staff) {
+        navigate('/')
+        return null
     }
 
     const calculateStats = (messagesData) => {
@@ -73,11 +104,6 @@ const ContactMessages = () => {
     const handleUpdateMessage = () => {
         fetchMessages()
     }
-
-    useEffect(() => {
-        fetchMessages()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [])
 
     if (isLoading) {
         return (

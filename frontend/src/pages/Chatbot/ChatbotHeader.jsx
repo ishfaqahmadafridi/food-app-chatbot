@@ -1,7 +1,10 @@
 import React from 'react';
+import { useSelector } from 'react-redux';
 import { Bot } from 'lucide-react';
 
-const ChatbotHeader = ({ isAdmin }) => {
+const ChatbotHeader = () => {
+  const { isAdmin } = useSelector((state) => state.adminStatus);
+
   return (
     <div className='bg-linear-to-br from-[#667eea] to-[#764ba2] text-white p-5 flex items-center gap-4'>
       <Bot size={32} />

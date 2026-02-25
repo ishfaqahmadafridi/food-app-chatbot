@@ -1,60 +1,22 @@
-import React from 'react';
+
 import AdminHeader from './AdminHeader';
 import AdminControls from './AdminControls';
 import AdminFormSection from './AdminFormSection';
 import AdminItemsSection from './AdminItemsSection';
-import useAdminAccess from '../../hooks/admin/useAdminAccess';
-import useAdminHandlers from '../../hooks/admin/useAdminHandlers';
-import useAdminLogout from '../../hooks/admin/useAdminLogout';
+import { useState } from 'react';
 
 const Admin = () => {
-  const {
-    items,
-    loading,
-    formData,
-    editingId,
-    showForm,
-    imagePreview,
-    handleSubmit,
-    handleChange,
-    handleImageChange,
-    handleEdit,
-    handleDelete,
-    handleCancel,
-    toggleForm,
-    fetchItems
-  } = useAdminHandlers();
 
-  const { handleLogout } = useAdminLogout();
-
-  useAdminAccess(fetchItems);
-
+  const [showForm] = useState(false);
   return (
     <div className="min-h-screen bg-linear-to-br from-[#667eea] to-[#764ba2] p-5">
-      <AdminHeader onLogout={handleLogout} />
-
+      <AdminHeader />
       <div className="max-w-1200px mx-auto">
-        <AdminControls showForm={showForm} onToggleForm={toggleForm} />
-
+        <AdminControls />
         {showForm && (
-          <AdminFormSection
-            formData={formData}
-            editingId={editingId}
-            loading={loading}
-            imagePreview={imagePreview}
-            onSubmit={handleSubmit}
-            onChange={handleChange}
-            onImageChange={handleImageChange}
-            onCancel={handleCancel}
-          />
+          <AdminFormSection />
         )}
-
-        <AdminItemsSection
-          items={items}
-          loading={loading}
-          onEdit={handleEdit}
-          onDelete={handleDelete}
-        />
+        <AdminItemsSection />
       </div>
     </div>
   );

@@ -6,9 +6,8 @@ const useAdminLogout = () => {
 
   const handleLogout = () => {
     localStorage.removeItem('userToken');
-    localStorage.removeItem('adminToken');
-    navigate('/');
     toast.success('Logged out successfully');
+    navigate('/');
   };
 
   return { handleLogout };

@@ -1,7 +1,9 @@
 import React from 'react'
 import { Send, Loader2 } from 'lucide-react'
+import { useSelector } from 'react-redux'
 
-const SubmitButton = ({ text = 'Send Message', isSubmitting = false }) => {
+const SubmitButton = () => {
+        const isSubmitting = useSelector((state) => state.contactForm.isSubmitting)
     return (
         <button
             type='submit'
@@ -16,7 +18,7 @@ const SubmitButton = ({ text = 'Send Message', isSubmitting = false }) => {
             ) : (
                 <>
                     <Send size={20} />
-                    {text}
+                    Send Message
                 </>
             )}
         </button>

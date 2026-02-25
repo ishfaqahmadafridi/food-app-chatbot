@@ -1,7 +1,16 @@
 import React from 'react'
 import { Button } from '@/components/ui/button'
+import { useSelector } from 'react-redux';
 
-const LoginButton = ({isSubmitting,currstate}) => {
+
+
+const LoginButton = () => {
+
+     const { currstate } = useSelector((state) => state.loginState);
+     const { isSubmitting } = useSelector((state) => state.auth);
+
+     
+       
     return (
         <div>
             <Button

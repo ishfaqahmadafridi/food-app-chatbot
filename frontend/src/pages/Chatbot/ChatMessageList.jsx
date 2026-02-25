@@ -1,8 +1,11 @@
 import React, { useRef, useEffect } from 'react';
+import { useSelector } from 'react-redux';
 import ChatMessage from './ChatMessage';
 import TypingIndicator from './TypingIndicator';
 
-const ChatMessageList = ({ messages, isLoading }) => {
+const ChatMessageList = () => {
+  const { messages } = useSelector((state) => state.chatMessages);
+  const { loading: isLoading } = useSelector((state) => state.chatAPI);
   const messagesContainerRef = useRef(null);
   const messagesEndRef = useRef(null);
 

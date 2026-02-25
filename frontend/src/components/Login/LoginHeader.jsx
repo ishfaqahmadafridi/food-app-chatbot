@@ -1,7 +1,10 @@
 import React from 'react';
+import { useSelector } from 'react-redux';
 import { assets } from '../../assets/frontend_assets/assets';
 
-const LoginHeader = ({ currstate, onClose }) => {
+const LoginHeader = ({ onClose }) => {
+  const { currstate } = useSelector((state) => state.loginState);
+
   return (
     <div className="flex items-center justify-between text-black">
       <h2 className="text-xl font-semibold">{currstate}</h2>

@@ -1,7 +1,18 @@
 import React from 'react';
+import { useSelector, useDispatch } from 'react-redux';
 import { Input } from '@/components/ui/input';
+import { updateField } from '../../redux/features/auth/loginFormSlice';
 
-const LoginInputFields = ({ currstate, formData, onChange,  }) => {
+const LoginInputFields = () => {
+  const dispatch = useDispatch();
+  const { currstate } = useSelector((state) => state.loginState);
+  const { formData } = useSelector((state) => state.loginForm);
+
+    const handleChange = (e) => {
+      const { name, value } = e.target;
+      dispatch(updateField({ name, value }));
+    };
+
   return (
     <div className="flex flex-col gap-4">
       <Input
@@ -9,7 +20,7 @@ const LoginInputFields = ({ currstate, formData, onChange,  }) => {
         name="username"
         placeholder='username'
         value={formData.username}
-        onChange={onChange}
+        onChange={handleChange}
         autoComplete="username"
         required
       />
@@ -19,7 +30,7 @@ const LoginInputFields = ({ currstate, formData, onChange,  }) => {
           name="email"
           placeholder='email'
           value={formData.email}
-          onChange={onChange}
+          onChange={handleChange}
           autoComplete="email"
           required
         />
@@ -29,7 +40,7 @@ const LoginInputFields = ({ currstate, formData, onChange,  }) => {
         name="password"
         placeholder='password'
         value={formData.password}
-        onChange={onChange}
+        onChange={handleChange}
         autoComplete={currstate === "Login" ? "current-password" : "new-password"}
         required
       />
@@ -39,7 +50,7 @@ const LoginInputFields = ({ currstate, formData, onChange,  }) => {
           name="password2"
           placeholder='confirm password'
           value={formData.password2}
-          onChange={onChange}
+          onChange={handleChange}
           autoComplete="new-password"
           required
         />
