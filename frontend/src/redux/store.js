@@ -13,8 +13,9 @@ import contactFormReducer from './features/contact/contactFormSlice'
 import loginStateReducer from './features/auth/loginStateSlice'
 import loginFormReducer from './features/auth/loginFormSlice'
 import authReducer from './features/auth/authThunk/authSlice'
-import profileDataReducer from './features/profile/profileDataSlice'
+import profileDataReducer from './features/profile/profileData/profileDataSlice'
 import menuReducer from './features/menu/menuSlice'
+import profileImage from './features/profile/profileImageThunk/profileImageSlice'
 
 export const store = configureStore({
   reducer: {
@@ -38,6 +39,7 @@ export const store = configureStore({
     auth: authReducer,
     // Profile reducers
     profileData: profileDataReducer,
+    profileImage: profileImage,
     // Menu reducers
     menu: menuReducer,
   },

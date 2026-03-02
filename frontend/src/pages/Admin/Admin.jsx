@@ -1,9 +1,8 @@
 
-import AdminHeader from './AdminHeader';
-import AdminControls from './AdminControls';
-import AdminFormSection from './AdminFormSection';
-import AdminItemsSection from './AdminItemsSection';
-import { useState } from 'react';
+import AdminHeader from '../../components/Admin/AdminHeader';
+import AdminControls from '../../components/Admin/AdminControls';
+import AdminFormSection from '../../components/Admin/AdminFormSection';
+import AdminItemsSection from '../../components/Admin/AdminItemsSection';
 import { useSelector } from 'react-redux';
 
 const Admin = () => {

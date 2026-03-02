@@ -1,172 +1,54 @@
-import React, { useState, useEffect } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { useDispatch, useSelector } from 'react-redux'
+import React, { useEffect, useState } from 'react'
+import { useDispatch } from 'react-redux'
 import { checkAdminAccess } from '@/redux/features/admin/adminAccess/adminAccessThunk'
-import MessagesHeader from './MessagesHeader'
-import MessagesFilterTabs from './MessagesFilterTabs'
-import MessageCard from './MessageCard'
-import MessageDetailModal from './MessageDetailModal'
-import api from '@/services/api'
-import toast from 'react-hot-toast'
-import { Loader2, ArrowLeft } from 'lucide-react'
+
+import AdminGuardAndLoading from '../../../components/contactMessages/AdminGuardAndLoading'
+import MessagesMainView from '../../../components/contactMessages/MessagesMainView'
 
 const ContactMessages = () => {
-    const navigate = useNavigate()
-    const dispatch = useDispatch()
-    const { user, loading: adminLoading, error: adminError } = useSelector((state) => state.adminAccess)
-    
-    const [messages, setMessages] = useState([])
-    const [filteredMessages, setFilteredMessages] = useState([])
-    const [activeFilter, setActiveFilter] = useState('all')
-    const [isLoading, setIsLoading] = useState(true)
-    const [selectedMessage, setSelectedMessage] = useState(null)
-    const [stats, setStats] = useState({
-        total: 0,
-        new: 0,
-        replied: 0,
-        archived: 0
-    })
+  const dispatch = useDispatch()
 
-    useEffect(() => {
-        dispatch(checkAdminAccess())
-            .unwrap()
-            .then(() => {
-                fetchMessages()
-            })
-            .catch((err) => {
-                console.error(err)
-                navigate('/')
-            })
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [dispatch, navigate])
+  const [messages, setMessages] = useState([])
+  const [isLoading, setIsLoading] = useState(true)
 
-    const fetchMessages = async () => {
-        setIsLoading(true)
-        try {
-            const response = await api.get('/contact/')
-            if (response.data.success) {
-                setMessages(response.data.messages)
-                calculateStats(response.data.messages)
-                filterMessages(response.data.messages, activeFilter)
-            }
-        } catch (error) {
-            console.error('Error fetching messages:', error)
-            toast.error('Failed to load messages')
-        } finally {
-            setIsLoading(false)
-        }
+  useEffect(() => {
+    const initialize = async () => {
+      try {
+        await dispatch(checkAdminAccess()).unwrap()
+        await fetchMessages()
+      } catch (error) {
+        console.error('Admin access check failed:', error)
+        setIsLoading(false)
+      }
     }
 
-    if (adminLoading) {
-        return (
-            <div className="min-h-screen bg-linear-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
-                <Loader2 className="w-8 h-8 animate-spin text-indigo-600" />
-            </div>
-        )
+    initialize()
+  }, [dispatch])
+
+  const fetchMessages = async () => {
+    setIsLoading(true)
+    try {
+      const api = (await import('@/services/api')).default
+      const response = await api.get('/contact/')
+      if (response.data?.success) {
+        setMessages(response.data.messages || [])
+      }
+    } catch (error) {
+      console.error('Failed to load contact messages:', error)
+    } finally {
+      setIsLoading(false)
     }
+  }
 
-    if (adminError || !user || !user.is_staff) {
-        navigate('/')
-        return null
-    }
-
-    const calculateStats = (messagesData) => {
-        const newStats = {
-            total: messagesData.length,
-            new: messagesData.filter(m => m.status === 'new').length,
-            replied: messagesData.filter(m => m.status === 'replied').length,
-            archived: messagesData.filter(m => m.status === 'archived').length
-        }
-        setStats(newStats)
-    }
-
-    const filterMessages = (messagesData, filter) => {
-        if (filter === 'all') {
-            setFilteredMessages(messagesData)
-        } else {
-            setFilteredMessages(messagesData.filter(m => m.status === filter))
-        }
-    }
-
-    const handleFilterChange = (filter) => {
-        setActiveFilter(filter)
-        filterMessages(messages, filter)
-    }
-
-    const handleViewDetails = (message) => {
-        setSelectedMessage(message)
-    }
-
-    const handleCloseModal = () => {
-        setSelectedMessage(null)
-    }
-
-    const handleUpdateMessage = () => {
-        fetchMessages()
-    }
-
-    if (isLoading) {
-        return (
-            <div className='flex justify-center items-center h-screen'>
-                <Loader2 className='w-8 h-8 animate-spin text-[#667eea]' />
-            </div>
-        )
-    }
-
-    return (
-        <div className='min-h-screen bg-gray-50 p-6'>
-            <div className='max-w-7xl mx-auto'>
-                {/* Back Button */}
-                <button
-                    onClick={() => navigate('/admin')}
-                    className='mb-6 flex items-center gap-2 text-gray-700 hover:text-[#667eea] transition-colors'
-                >
-                    <ArrowLeft size={20} />
-                    <span className='font-medium'>Back to Admin Panel</span>
-                </button>
-
-                <MessagesHeader stats={stats} />
-                
-                <MessagesFilterTabs
-                    activeFilter={activeFilter}
-                    onFilterChange={handleFilterChange}
-                    counts={{
-                        all: stats.total,
-                        new: stats.new,
-                        read: messages.filter(m => m.status === 'read').length,
-                        replied: stats.replied,
-                        archived: stats.archived
-                    }}
-                />
-
-                {/* Messages Grid */}
-                {filteredMessages.length === 0 ? (
-                    <div className='text-center py-12'>
-                        <p className='text-gray-500 text-lg'>No messages found</p>
-                    </div>
-                ) : (
-                    <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'>
-                        {filteredMessages.map((message) => (
-                            <MessageCard
-                                key={message.id}
-                                message={message}
-                                onViewDetails={handleViewDetails}
-                            />
-                        ))}
-                    </div>
-                )}
-            </div>
-
-            {/* Detail Modal */}
-            {selectedMessage && (
-                <MessageDetailModal
-                    message={selectedMessage}
-                    onClose={handleCloseModal}
-                    onUpdate={handleUpdateMessage}
-                />
-            )}
-        </div>
-    )
+  return (
+    <AdminGuardAndLoading isLoading={isLoading}>
+      <MessagesMainView
+        messages={messages}
+        isLoading={isLoading}
+        setMessages={setMessages}
+      />
+    </AdminGuardAndLoading>
+  )
 }
 
-export default ContactMessages
+export default ContactMessages;

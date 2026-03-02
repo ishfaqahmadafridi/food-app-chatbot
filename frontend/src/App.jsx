@@ -11,21 +11,30 @@ import Chatbot from './pages/Chatbot/Chatbot';
 import Admin from './pages/Admin/Admin';
 import Profile from './pages/Profile/Profile';
 import Menu from './pages/Menu/Menu';
-import ItemDetail from './pages/ItemDetail/ItemDetail';
+import ItemDetail from './pages/itemDetial/ItemDetail';
 import Contact from './pages/ContactUs/Contact';
 import ContactMessages from './pages/Admin/ContactMessages/ContactMessages';
 import Navbar from './components/Navbar/Navbar';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchUserProfile } from './redux/features/profile/profileData/profileDataThunk';
+import LoadingState from './components/profile/profileloadingState/LoadingState';
 
 function App() {
-  const location = useLocation();
+  const dispatch = useDispatch();
 
+  const { loading, user } = useSelector((state) => state.profileData);
+
+  // Fetch the user profile when the component mounts (only if not already fetched)
   useEffect(() => {
-    window.scrollTo({
-      top: 0,
-      left: 0,
-      behavior: 'instant'
-    });
-  }, [location.pathname])
+    if (!user) {  // Fetch user profile only if it doesn't exist in Redux state
+      dispatch(fetchUserProfile());
+    }
+  }, [dispatch, user]);  // Only re-run if `user` is not already available
+
+  // Show loading state while fetching profile data
+  if (loading && !user) {
+    return <LoadingState />;
+  }
 
   return (
     <StoreProvider>
@@ -48,7 +57,6 @@ function App() {
           {/* Admin Routes */}
           <Route path="/admin" element={<Admin />} />
           <Route path="/admin/contacts" element={<ContactMessages />} />
-          
 
           {/* Fallback */}
           <Route path="*" element={<Navigate to="/" replace />} />

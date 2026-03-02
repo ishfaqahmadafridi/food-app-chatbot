@@ -1,7 +1,7 @@
 
-import ChatbotHeader from './ChatbotHeader';
-import ChatMessageList from './ChatMessageList';
-import ChatInput from './ChatInput';
+import ChatbotHeader from '../../components/chatbot/ChatbotHeader';
+import ChatMessageList from '../../components/chatbot/ChatMessageList';
+import ChatInput from '../../components/chatbot/ChatInput';
 
 const Chatbot = () => {
 

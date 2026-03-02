@@ -1,10 +1,10 @@
 import React from 'react'
 import Footer from '../../components/Footer/Footer'
-import ContactHero from './ContactHero'
-import ContactInfoCards from './ContactInfoCards'
-import ContactForm from './ContactForm'
-import LocationMap from './LocationMap'
-import BusinessHours from './BusinessHours'
+import ContactHero from '../../components/ContactUs/ContactHero'
+import ContactInfoCards from '../../components/ContactUs/ContactInfoCards'
+import ContactForm from '../../components/ContactUs/ContactForm'
+import LocationMap from '../../components/ContactUs/LocationMap'
+import BusinessHours from '../../components/ContactUs/BusinessHours'
 
 const Contact = () => {
     return (
